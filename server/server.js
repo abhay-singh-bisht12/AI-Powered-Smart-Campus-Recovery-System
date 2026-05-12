@@ -14,8 +14,7 @@ import { signAuthToken, verifyAuthToken } from "./auth.js";
 
 import {
   sendMail,
-  claimApprovedOwnerEmail,
-  claimApprovedClaimerEmail
+  claimApprovedOwnerEmail
 } from "./utils/sendMail.js";
 
 import { findBestMatch } from "./utils/aiMatcher.js";
@@ -51,12 +50,11 @@ function sendRealtimeNotification(target, data) {
   io.to(target).emit("campusNotification", data);
 }
 
-// demo-safe email: fail/timeout hoga tab bhi approval fail nahi hoga
 function sendMailSafe(mailOptions) {
   Promise.race([
     sendMail(mailOptions),
     new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Email timeout ignored")), 7000)
+      setTimeout(() => reject(new Error("Email timeout ignored")), 5000)
     )
   ])
     .then(() => {
@@ -65,6 +63,22 @@ function sendMailSafe(mailOptions) {
     .catch((error) => {
       console.log("Email failed but ignored:", error.message);
     });
+}
+
+function claimApprovedClaimerEmailLocal({ item, claim }) {
+  return `
+    <div style="font-family:Arial;padding:20px;">
+      <h2 style="color:#16a34a;">Claim Approved</h2>
+      <p>Hello ${claim.requesterName || "Student"},</p>
+      <p>Your claim request has been approved by admin.</p>
+      <p><b>Item:</b> ${item.title || "-"}</p>
+      <p><b>Category:</b> ${item.category || "-"}</p>
+      <p><b>Location:</b> ${item.location || "-"}</p>
+      <p>Please contact the admin/reporter for collection.</p>
+      <br/>
+      <p>Regards,<br/>AI-Powered Smart Campus Recovery System</p>
+    </div>
+  `;
 }
 
 app.use(
@@ -463,9 +477,7 @@ app.patch("/api/claims/:id/approve", async (req, res) => {
       { status: "rejected" }
     );
 
-    const ownerEmail = String(
-      item.contactEmail || item.createdBy || ""
-    )
+    const ownerEmail = String(item.contactEmail || item.createdBy || "")
       .trim()
       .toLowerCase();
 
@@ -479,12 +491,6 @@ app.patch("/api/claims/:id/approve", async (req, res) => {
         message: `Your item "${item.title}" has been claimed.`,
         type: "approved"
       });
-
-      sendMailSafe({
-        to: ownerEmail,
-        subject: "Your reported item has been claimed",
-        html: claimApprovedOwnerEmail({ item, claim })
-      });
     }
 
     if (claimerEmail) {
@@ -493,20 +499,33 @@ app.patch("/api/claims/:id/approve", async (req, res) => {
         message: `Your claim for "${item.title}" has been approved.`,
         type: "approved"
       });
-
-      sendMailSafe({
-        to: claimerEmail,
-        subject: "Your claim request has been approved",
-        html: claimApprovedClaimerEmail({ item, claim })
-      });
     }
 
     res.json({
-      ...claim.toJSON(),
+      success: true,
+      message: "Claim approved successfully",
+      claim: claim.toJSON(),
       itemStatus: item.status,
-      emailQueued: true,
-      message: "Claim approved successfully"
+      emailQueued: true
     });
+
+    setTimeout(() => {
+      if (ownerEmail) {
+        sendMailSafe({
+          to: ownerEmail,
+          subject: "Your reported item has been claimed",
+          html: claimApprovedOwnerEmail({ item, claim })
+        });
+      }
+
+      if (claimerEmail) {
+        sendMailSafe({
+          to: claimerEmail,
+          subject: "Your claim request has been approved",
+          html: claimApprovedClaimerEmailLocal({ item, claim })
+        });
+      }
+    }, 0);
   } catch (error) {
     console.error("Approve claim error:", error);
     res.status(500).json({ error: "failed_to_approve_claim" });
@@ -566,7 +585,13 @@ app.delete("/api/claims/:id", async (req, res) => {
       return res.status(403).json({ error: "admin_only" });
     }
 
-    const claim = await ClaimRequest.findByIdAndDelete(req.params.id);
+    const claimId = String(req.params.id || "").trim();
+
+    if (!mongoose.isValidObjectId(claimId)) {
+      return res.status(400).json({ error: "bad_claim_id" });
+    }
+
+    const claim = await ClaimRequest.findByIdAndDelete(claimId);
 
     if (!claim) {
       return res.status(404).json({ error: "claim_not_found" });
@@ -618,12 +643,12 @@ app.post("/api/items", async (req, res) => {
     }
 
     const created = await Item.create({
-      title: String(body.title).trim(),
-      description: String(body.description).trim(),
-      location: String(body.location).trim(),
-      date: String(body.date).trim(),
+      title: String(body.title || "").trim(),
+      description: String(body.description || "").trim(),
+      location: String(body.location || "").trim(),
+      date: String(body.date || "").trim(),
       type: body.type === "found" ? "found" : "lost",
-      category: String(body.category).trim(),
+      category: String(body.category || "").trim(),
       contactName: String(body.contactName || "").trim(),
       contactPhone: String(body.contactPhone || "").trim(),
       contactEmail: String(body.contactEmail || "").trim(),
