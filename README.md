@@ -3,6 +3,31 @@
 An intelligent AI-based Lost & Found platform designed for colleges and universities to help students recover lost items quickly, securely, and efficiently.
 
 ---
+# 🌐 Live Deployment
+
+## 🚀 Live Project
+
+🔗 **Live Demo:**  
+https://https://ai-powered-smart-campus-recovery-sy.vercel.app/
+
+---
+
+## ⚙️ Backend API
+
+🔗 **Backend Server:**  
+https://ai-campus-recovery-server.onrender.com
+
+🔗 **Health Check:**  
+https://ai-campus-recovery-server.onrender.com/api/health
+
+---
+
+## 📌 Deployment Platforms
+
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** MongoDB Atlas
+- **AI API:** Groq API
 
 # 📌 Problem Statement
 
