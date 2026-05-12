@@ -1445,5 +1445,7 @@ function showNotificationToast(data) {
   }, 4500);
 }
 
-createNotificationBell();
-setupRealtimeNotifications();
+if (currentUser && page !== "login" && page !== "register") {
+  createNotificationBell();
+  setupRealtimeNotifications();
+}
