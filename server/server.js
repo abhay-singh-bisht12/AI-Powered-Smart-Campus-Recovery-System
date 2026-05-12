@@ -26,7 +26,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const clientOrigin = process.env.CLIENT_ORIGIN || "*";
-
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -50,6 +49,22 @@ io.on("connection", (socket) => {
 
 function sendRealtimeNotification(target, data) {
   io.to(target).emit("campusNotification", data);
+}
+
+// demo-safe email: fail/timeout hoga tab bhi approval fail nahi hoga
+function sendMailSafe(mailOptions) {
+  Promise.race([
+    sendMail(mailOptions),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Email timeout ignored")), 7000)
+    )
+  ])
+    .then(() => {
+      console.log("Email sent:", mailOptions.to);
+    })
+    .catch((error) => {
+      console.log("Email failed but ignored:", error.message);
+    });
 }
 
 app.use(
@@ -113,6 +128,7 @@ app.get("/api/health", (_req, res) => {
     message: "Server is working"
   });
 });
+
 // ================= AI CHATBOT =================
 
 app.post("/api/ai/chat", async (req, res) => {
@@ -447,44 +463,49 @@ app.patch("/api/claims/:id/approve", async (req, res) => {
       { status: "rejected" }
     );
 
-    const ownerEmail = String(item.contactEmail || item.createdBy || "").trim().toLowerCase();
-    const claimerEmail = String(claim.requesterEmail || "").trim().toLowerCase();
+    const ownerEmail = String(
+      item.contactEmail || item.createdBy || ""
+    )
+      .trim()
+      .toLowerCase();
 
-    try {
-      if (ownerEmail) {
-        await sendMail({
-          to: ownerEmail,
-          subject: "Your reported item has been claimed",
-          html: claimApprovedOwnerEmail({ item, claim })
-        });
+    const claimerEmail = String(claim.requesterEmail || "")
+      .trim()
+      .toLowerCase();
 
-        sendRealtimeNotification(ownerEmail, {
-          title: "Item Claimed",
-          message: `Your item "${item.title}" has been claimed.`,
-          type: "approved"
-        });
-      }
+    if (ownerEmail) {
+      sendRealtimeNotification(ownerEmail, {
+        title: "Item Claimed",
+        message: `Your item "${item.title}" has been claimed.`,
+        type: "approved"
+      });
 
-      if (claimerEmail) {
-        await sendMail({
-          to: claimerEmail,
-          subject: "Your claim request has been approved",
-          html: claimApprovedClaimerEmail({ item, claim })
-        });
+      sendMailSafe({
+        to: ownerEmail,
+        subject: "Your reported item has been claimed",
+        html: claimApprovedOwnerEmail({ item, claim })
+      });
+    }
 
-        sendRealtimeNotification(claimerEmail, {
-          title: "Claim Approved",
-          message: `Your claim for "${item.title}" has been approved.`,
-          type: "approved"
-        });
-      }
-    } catch (mailError) {
-      console.error("Email sending failed:", mailError);
+    if (claimerEmail) {
+      sendRealtimeNotification(claimerEmail, {
+        title: "Claim Approved",
+        message: `Your claim for "${item.title}" has been approved.`,
+        type: "approved"
+      });
+
+      sendMailSafe({
+        to: claimerEmail,
+        subject: "Your claim request has been approved",
+        html: claimApprovedClaimerEmail({ item, claim })
+      });
     }
 
     res.json({
       ...claim.toJSON(),
-      emailSent: true
+      itemStatus: item.status,
+      emailQueued: true,
+      message: "Claim approved successfully"
     });
   } catch (error) {
     console.error("Approve claim error:", error);
@@ -503,6 +524,10 @@ app.patch("/api/claims/:id/reject", async (req, res) => {
 
     const claimId = String(req.params.id || "").trim();
 
+    if (!mongoose.isValidObjectId(claimId)) {
+      return res.status(400).json({ error: "bad_claim_id" });
+    }
+
     const claim = await ClaimRequest.findByIdAndUpdate(
       claimId,
       { status: "rejected" },
@@ -511,6 +536,18 @@ app.patch("/api/claims/:id/reject", async (req, res) => {
 
     if (!claim) {
       return res.status(404).json({ error: "claim_not_found" });
+    }
+
+    const claimerEmail = String(claim.requesterEmail || "")
+      .trim()
+      .toLowerCase();
+
+    if (claimerEmail) {
+      sendRealtimeNotification(claimerEmail, {
+        title: "Claim Rejected",
+        message: `Your claim for "${claim.itemTitle}" has been rejected.`,
+        type: "rejected"
+      });
     }
 
     res.json(claim);
@@ -560,7 +597,6 @@ app.post("/api/items", async (req, res) => {
     if (!authUser || res.headersSent) return;
 
     const body = req.body || {};
-
     let aiMatch = null;
 
     if (body.type === "lost") {
