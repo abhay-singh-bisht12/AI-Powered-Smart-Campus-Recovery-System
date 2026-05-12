@@ -8,7 +8,7 @@ An intelligent AI-based Lost & Found platform designed for colleges and universi
 ## 🚀 Live Project
 
 🔗 **Live Demo:**  
-https://https://ai-powered-smart-campus-recovery-sy.vercel.app/
+https://ai-powered-smart-campus-recovery-sy.vercel.app/
 
 ---
 
