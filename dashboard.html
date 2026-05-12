@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Campus Lost & Found</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+
+<body data-page="dashboard">
+
+  <header class="hero">
+    <nav class="navbar">
+      <div class="logo">Campus Lost & Found</div>
+
+      <div class="nav-links">
+        <a href="dashboard.html">Home</a>
+        <a href="my-reports.html">My Reports</a>
+        <a href="help-center.html">Help Center</a>
+
+        <div class="nav-actions profile-wrapper">
+
+          <button id="profileBtn" class="profile-icon" type="button">
+            👤
+          </button>
+
+          <div id="profileDropdown" class="profile-dropdown hidden">  
+            <h3 id="profileName">Student</h3>
+
+            <p>
+              <strong>Email:</strong>
+              <span id="profileEmail">-</span>
+            </p>
+
+            <p>
+              <strong>Phone:</strong>
+              <span id="profilePhone">-</span>
+            </p>
+
+            <p>
+              <strong>Branch:</strong>
+              <span id="profileBranch">-</span>
+            </p>
+
+            <p>
+              <strong>Roll No:</strong>
+              <span id="profileRoll">-</span>
+            </p>
+
+            <a href="profile-setup.html" class="edit-profile-btn">
+              Edit Profile
+            </a>
+          </div>
+
+          <button id="themeToggle" class="theme-toggle" type="button">
+  🌙
+        </button>
+
+          <button id="logoutBtn" class="nav-btn nav-btn-small" type="button">
+            Logout
+          </button>
+          
+
+        </div>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+
+      <div class="hero-left">
+        <h1>Campus Lost & Found Portal</h1>
+
+        <p>
+          Students can report lost or found items, browse approved reports,
+          and connect with the owner or finder easily.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#browse" class="btn primary">Browse Items</a>
+          <a href="#report" class="btn secondary">Report Item</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+
+        <div class="stat-card">
+          <h3 id="totalCount">0</h3>
+          <p>Total Reports</p>
+        </div>
+
+        <div class="stat-card">
+          <h3 id="lostCount">0</h3>
+          <p>Lost Items</p>
+        </div>
+
+        <div class="stat-card">
+          <h3 id="foundCount">0</h3>
+          <p>Found Items</p>
+        </div>
+
+        <div class="stat-card">
+          <h3 id="claimedCount">0</h3>
+          <p>Claimed</p>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section id="browse" class="panel">
+
+      <div class="section-head">
+        <h2>Browse Approved Items</h2>
+        <p>Only admin-approved reports are shown here.</p>
+      </div>
+
+      <div class="filters">
+
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by title, category, location..."
+        />
+
+        <select id="typeFilter">
+          <option value="all">All Types</option>
+          <option value="lost">Lost</option>
+          <option value="found">Found</option>
+        </select>
+
+        <select id="categoryFilter">
+          <option value="All">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Documents">Documents</option>
+          <option value="Accessories">Accessories</option>
+          <option value="Keys">Keys</option>
+          <option value="Bags">Bags</option>
+          <option value="Books">Books</option>
+          <option value="Other">Other</option>
+        </select>
+
+      </div>
+
+      <div id="itemsLoader" class="loader hidden">
+        <div class="spinner"></div>
+        <p>Loading items...</p>
+      </div>
+
+      <div id="itemsContainer" class="cards"></div>
+
+    </section>
+
+    <section id="report" class="panel">
+
+      <div class="section-head">
+        <h2>Report Lost / Found Item</h2>
+        <p>Submit item details. Admin will review your report shortly.</p>
+      </div>
+
+      <form id="itemForm" class="report-form">
+
+        <div class="form-group">
+          <label>Item Title</label>
+          <input type="text" id="title" required />
+        </div>
+
+        <div class="form-group">
+          <label>Type</label>
+
+          <select id="type" required>
+            <option value="lost">Lost</option>
+            <option value="found">Found</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+
+          <select id="category" required>
+            <option value="Electronics">Electronics</option>
+            <option value="Documents">Documents</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Keys">Keys</option>
+            <option value="Bags">Bags</option>
+            <option value="Books">Books</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="location" required />
+        </div>
+
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="date" required />
+        </div>
+
+        <div class="form-group">
+          <label>Contact Name</label>
+          <input type="text" id="contactName" required />
+        </div>
+
+        <div class="form-group">
+          <label>Contact Phone</label>
+          <input type="text" id="contactPhone" required />
+        </div>
+
+        <div class="form-group">
+          <label>Contact Email</label>
+          <input type="email" id="contactEmail" required />
+        </div>
+
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea id="description" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>Upload Item Photo</label>
+
+          <p class="helper-text">
+            Upload a clear photo of the lost/found item.
+          </p>
+
+          <input type="file" id="imageUpload" accept="image/*" />
+
+          <img
+            id="imagePreview"
+            class="image-preview hidden"
+            src="#"
+            alt="Image Preview"
+          />
+        </div>
+
+        <div class="form-group full">
+          <button type="submit" class="btn primary full-btn">
+            Submit Report
+          </button>
+        </div>
+
+      </form>
+
+      <p id="successMessage" class="message-text"></p>
+
+    </section>
+
+  </main>
+  <!-- AI Campus Chatbot Assistant -->
+<div class="campus-chatbot">
+  <button id="chatbotToggle" class="chatbot-toggle" type="button">
+    🤖
+  </button>
+
+  <div id="chatbotBox" class="chatbot-box hidden">
+    <div class="chatbot-header">
+      <div>
+        <h3>AI Campus Assistant</h3>
+        <p>Ask about report, claim, AI match or approval</p>
+      </div>
+      <button id="chatbotClose" type="button">×</button>
+    </div>
+
+    <div id="chatbotMessages" class="chatbot-messages">
+      <div class="bot-msg">
+        Hi! I am your Campus Recovery Assistant. How can I help you?
+      </div>
+    </div>
+
+    <div class="chatbot-actions">
+      <button class="quick-chat" data-question="How to report lost item?">Report Lost</button>
+      <button class="quick-chat" data-question="How to claim an item?">Claim Item</button>
+      <button class="quick-chat" data-question="What is AI smart match?">AI Match</button>
+    </div>
+
+    <div class="chatbot-input-row">
+      <button id="voiceBtn" class="voice-btn" type="button">🎤</button>
+      <input
+        type="text"
+        id="chatbotInput"
+        placeholder="Type or speak your question..."
+      />
+      <button id="sendChatBtn" type="button">Send</button>
+    </div>
+  </div>
+</div>
+
+  <div id="modal" class="modal hidden">
+
+    <div class="modal-box">
+
+      <button id="closeModal" class="close-btn">
+        &times;
+      </button>
+
+      <div id="modalContent"></div>
+
+    </div>
+
+  </div>
+
+ <script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const profileBtn = document.getElementById("profileBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+    const profilePhone = document.getElementById("profilePhone");
+    const profileBranch = document.getElementById("profileBranch");
+    const profileRoll = document.getElementById("profileRoll");
+
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+
+    profileName.innerText = user.studentName || user.name || "Student";
+    profileEmail.innerText = user.email || "-";
+    profilePhone.innerText = user.studentPhone || "-";
+    profileBranch.innerText = user.studentBranch || "-";
+    profileRoll.innerText = user.studentRollNo || "-";
+
+    profileBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+
+      profileDropdown.classList.toggle("hidden");
+    });
+
+    profileDropdown.addEventListener("click", function (e) {
+      e.stopPropagation();
+    });
+
+    document.addEventListener("click", function (e) {
+
+      if (
+        !profileDropdown.contains(e.target) &&
+        !profileBtn.contains(e.target)
+      ) {
+        profileDropdown.classList.add("hidden");
+      }
+
+    });
+
+  });
+</script>
+
+</body>
+</html>

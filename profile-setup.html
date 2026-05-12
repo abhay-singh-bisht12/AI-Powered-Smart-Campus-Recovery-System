@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Profile Setup - Campus Lost & Found</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+
+<body data-page="profile-setup">
+  <section class="auth-page">
+    <div class="auth-card">
+      <div class="auth-left">
+        <span class="tag">Profile Setup</span>
+        <h1>Complete Your Profile</h1>
+        <p>Fill your student details before entering the main portal.</p>
+      </div>
+
+      <div class="auth-right">
+        <h2>Student Profile</h2>
+
+        <form id="profileSetupForm">
+          <div class="form-group">
+            <label>Student Name</label>
+            <input type="text" id="studentName" required />
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" id="studentPhone" required />
+          </div>
+
+          <div class="form-group">
+            <label>Branch</label>
+            <input type="text" id="studentBranch" required />
+          </div>
+
+          <div class="form-group">
+            <label>Roll Number</label>
+            <input type="text" id="studentRollNo" required />
+          </div>
+
+          <button type="submit" class="btn primary full-btn">
+            Save Profile & Continue
+          </button>
+
+          <p id="profileSetupMessage" class="message-text"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

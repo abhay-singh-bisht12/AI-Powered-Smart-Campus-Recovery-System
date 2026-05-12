@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>My Reports - Campus Lost & Found</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+
+<body data-page="my-reports">
+  <header class="inner-header">
+    <div class="container header-bar">
+      <div class="logo dark">Campus Lost & Found</div>
+
+      <div class="nav-links dark-links">
+        <a href="dashboard.html">Home</a>
+        <a href="my-reports.html">My Reports</a>
+        <a href="help-center.html">Help Center</a>
+
+        <div class="nav-actions">
+          <button id="logoutBtn" class="nav-btn nav-btn-small" type="button">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <div class="section-head">
+        <h2>My Reports</h2>
+        <p>
+          Track all your submitted lost and found reports with approval status.
+        </p>
+      </div>
+
+      <div id="myReportsContainer" class="cards"></div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button id="closeModal" class="close-btn">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+</body>
+</html>
