@@ -13,8 +13,9 @@ import { ClaimRequest } from "./models/ClaimRequest.js";
 import { signAuthToken, verifyAuthToken } from "./auth.js";
 
 import {
-  sendMail,
-  claimApprovedOwnerEmail
+  sendMailSafe,
+  claimApprovedOwnerEmail,
+  claimApprovedClaimerEmail
 } from "./utils/sendMail.js";
 
 import { findBestMatch } from "./utils/aiMatcher.js";
@@ -48,37 +49,6 @@ io.on("connection", (socket) => {
 
 function sendRealtimeNotification(target, data) {
   io.to(target).emit("campusNotification", data);
-}
-
-function sendMailSafe(mailOptions) {
-  Promise.race([
-    sendMail(mailOptions),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Email timeout ignored")), 5000)
-    )
-  ])
-    .then(() => {
-      console.log("Email sent:", mailOptions.to);
-    })
-    .catch((error) => {
-      console.log("Email failed but ignored:", error.message);
-    });
-}
-
-function claimApprovedClaimerEmailLocal({ item, claim }) {
-  return `
-    <div style="font-family:Arial;padding:20px;">
-      <h2 style="color:#16a34a;">Claim Approved</h2>
-      <p>Hello ${claim.requesterName || "Student"},</p>
-      <p>Your claim request has been approved by admin.</p>
-      <p><b>Item:</b> ${item.title || "-"}</p>
-      <p><b>Category:</b> ${item.category || "-"}</p>
-      <p><b>Location:</b> ${item.location || "-"}</p>
-      <p>Please contact the admin/reporter for collection.</p>
-      <br/>
-      <p>Regards,<br/>AI-Powered Smart Campus Recovery System</p>
-    </div>
-  `;
 }
 
 app.use(
@@ -522,7 +492,7 @@ app.patch("/api/claims/:id/approve", async (req, res) => {
         sendMailSafe({
           to: claimerEmail,
           subject: "Your claim request has been approved",
-          html: claimApprovedClaimerEmailLocal({ item, claim })
+          html: claimApprovedClaimerEmail({ item, claim })
         });
       }
     }, 0);

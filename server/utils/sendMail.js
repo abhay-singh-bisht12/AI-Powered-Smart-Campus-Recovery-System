@@ -1,61 +1,70 @@
-import nodemailer from "nodemailer";
-
-const EMAIL_USER = process.env.EMAIL_USER;
-const EMAIL_PASS = process.env.EMAIL_PASS;
-
-const APP_NAME =
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL;
+const BREVO_SENDER_NAME =
+  process.env.BREVO_SENDER_NAME ||
   process.env.APP_NAME ||
   "AI-powered Smart Campus Recovery System";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  pool: true,
-  maxConnections: 1,
-  auth: {
-    user: EMAIL_USER,
-    pass: EMAIL_PASS,
-  },
-  connectionTimeout: 5000,
-  greetingTimeout: 5000,
-  socketTimeout: 5000,
-});
-
-function withTimeout(promise, ms = 5000) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Email timeout")), ms)
-    ),
-  ]);
-}
-
 export async function sendMail({ to, subject, html }) {
-  if (!EMAIL_USER || !EMAIL_PASS) {
-    console.log("Email skipped: EMAIL_USER or EMAIL_PASS missing");
-    return;
-  }
+  try {
+    if (!BREVO_API_KEY || !BREVO_SENDER_EMAIL) {
+      console.log("Email skipped: BREVO_API_KEY or BREVO_SENDER_EMAIL missing");
+      return { success: false, skipped: true };
+    }
 
-  await withTimeout(
-    transporter.sendMail({
-      from: `"${APP_NAME}" <${EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-    }),
-    5000
-  );
+    if (!to || !subject || !html) {
+      console.log("Email skipped: missing to, subject, or html");
+      return { success: false, skipped: true };
+    }
+
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "api-key": BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: {
+          name: BREVO_SENDER_NAME,
+          email: BREVO_SENDER_EMAIL,
+        },
+        to: [
+          {
+            email: to,
+          },
+        ],
+        subject,
+        htmlContent: html,
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      console.log("Brevo Email Error:", data);
+      return { success: false, error: data };
+    }
+
+    console.log("Brevo Email Sent:", to);
+    return { success: true, data };
+  } catch (err) {
+    console.log("Brevo Email Failed:", err.message);
+    return { success: false, error: err.message };
+  }
 }
 
 export function sendMailSafe(mailOptions) {
   sendMail(mailOptions)
-    .then(() =>
-      console.log("Email sent:", mailOptions.to)
-    )
+    .then((res) => {
+      if (res?.success) {
+        console.log("Email sent:", mailOptions.to);
+      } else {
+        console.log("Email failed but ignored:", mailOptions.to);
+      }
+    })
     .catch((err) =>
-      console.log(
-        "Email failed but ignored:",
-        err.message
-      )
+      console.log("Email failed but ignored:", err.message)
     );
 }
 
@@ -82,20 +91,9 @@ export function claimApprovedOwnerEmail({ item, claim }) {
 
       <h3>Claimer Details</h3>
 
-      <p>
-        <b>Name:</b>
-        ${claim.requesterName || "-"}
-      </p>
-
-      <p>
-        <b>Email:</b>
-        ${claim.requesterEmail || "-"}
-      </p>
-
-      <p>
-        <b>Phone:</b>
-        ${claim.requesterPhone || "-"}
-      </p>
+      <p><b>Name:</b> ${claim.requesterName || "-"}</p>
+      <p><b>Email:</b> ${claim.requesterEmail || "-"}</p>
+      <p><b>Phone:</b> ${claim.requesterPhone || "-"}</p>
 
       <br/>
 
