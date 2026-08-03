@@ -25,7 +25,7 @@ import { findBestMatch } from "./utils/aiMatcher.js";
 
 const app = express();
 
-console.log("SERVER OWNER CLAIM FLOW v17.1.0 LOADED");
+console.log("SERVER OWNER CLAIM FLOW v17.2.0 LOADED");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,15 +57,27 @@ function allowClientOrigin(origin, callback) {
 
   const normalizedOrigin = String(origin).trim().toLowerCase();
 
-  const isConfiguredOrigin = allowedOrigins.has(normalizedOrigin);
-
-  // Allow only this project's Vercel production/preview domains.
-  const isProjectVercelOrigin =
-    normalizedOrigin.startsWith("https://ai-powered-smart-campus-recovery") &&
-    normalizedOrigin.endsWith(".vercel.app");
-
-  if (isConfiguredOrigin || isProjectVercelOrigin) {
+  if (allowedOrigins.has(normalizedOrigin)) {
     return callback(null, true);
+  }
+
+  try {
+    const { protocol, hostname } = new URL(normalizedOrigin);
+
+    const isHttps = protocol === "https:";
+
+    const isProductionFrontend =
+      hostname === "ai-powered-smart-campus-recovery-system.vercel.app";
+
+    const isProjectPreview =
+      hostname.startsWith("ai-powered-smart-campu-") &&
+      hostname.endsWith("-abhay-singh-bisht12s-projects.vercel.app");
+
+    if (isHttps && (isProductionFrontend || isProjectPreview)) {
+      return callback(null, true);
+    }
+  } catch {
+    // Invalid Origin header remains blocked.
   }
 
   console.warn(`[CORS BLOCKED] origin=${normalizedOrigin}`);
