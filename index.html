@@ -3,52 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Register - Campus Lost & Found</title>
-
-  <link rel="stylesheet" href="style.css" />
-  <script src="config.js"></script>
-  <script src="app.js" defer></script>
-</head> 
-
-<body data-page="register">
-  <section class="auth-page">
-    <div class="auth-card">
-      <div class="auth-left">
-        <span class="tag">Campus Safety Portal</span>
-        <h1>Create Account</h1>
-        <p>Register first to access the Campus Lost & Found Portal.</p>
-      </div>
-
-      <div class="auth-right">
-        <h2>Registration</h2>
-
-        <form id="registerForm">
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="registerName" required />
-          </div>
-
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="registerEmail" required />
-          </div>
-
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="registerPassword" required />
-          </div>
-
-          <button type="submit" class="btn primary full-btn">Register</button>
-          <p id="registerMessage" class="message-text"></p>
-        </form>
-
-        <p class="switch-text">
-          Already registered?
-          <a href="login.html" class="text-link">Go to Login</a>
-        </p>
-      </div>
-    </div>
-  </section>
+  <title>Campus Lost & Found</title>
+  <meta http-equiv="refresh" content="0; url=register.html" />
+  <script>
+    window.location.replace("register.html");
+  </script>
+</head>
+<body>
+  <p>
+    Redirecting to registration...
+    <a href="register.html">Continue</a>
+  </p>
 </body>
 </html>
