@@ -25,7 +25,7 @@ import { findBestMatch } from "./utils/aiMatcher.js";
 
 const app = express();
 
-console.log("SERVER OWNER CLAIM FLOW v17.2.0 LOADED");
+console.log("SERVER OWNER CLAIM FLOW v17.3.0 LOADED");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -70,8 +70,8 @@ function allowClientOrigin(origin, callback) {
       hostname === "ai-powered-smart-campus-recovery-system.vercel.app";
 
     const isProjectPreview =
-      hostname.startsWith("ai-powered-smart-campu-") &&
-      hostname.endsWith("-abhay-singh-bisht12s-projects.vercel.app");
+      hostname.startsWith("ai-powered-smart-campu") &&
+      hostname.endsWith(".vercel.app");
 
     if (isHttps && (isProductionFrontend || isProjectPreview)) {
       return callback(null, true);
