@@ -25,14 +25,14 @@ import { findBestMatch } from "./utils/aiMatcher.js";
 
 const app = express();
 
-console.log("SERVER OWNER CLAIM FLOW v17.0.0 LOADED");
+console.log("SERVER OWNER CLAIM FLOW v17.1.0 LOADED");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const configuredOrigins = String(process.env.CLIENT_ORIGIN || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().toLowerCase())
   .filter(Boolean);
 
 const allowedOrigins = new Set([
@@ -51,11 +51,25 @@ const allowedOrigins = new Set([
 
 function allowClientOrigin(origin, callback) {
   // Requests without an Origin header include server-to-server calls and health checks.
-  if (!origin || allowedOrigins.has(origin)) {
+  if (!origin) {
     return callback(null, true);
   }
 
-  return callback(new Error("origin_not_allowed"));
+  const normalizedOrigin = String(origin).trim().toLowerCase();
+
+  const isConfiguredOrigin = allowedOrigins.has(normalizedOrigin);
+
+  // Allow only this project's Vercel production/preview domains.
+  const isProjectVercelOrigin =
+    normalizedOrigin.startsWith("https://ai-powered-smart-campus-recovery") &&
+    normalizedOrigin.endsWith(".vercel.app");
+
+  if (isConfiguredOrigin || isProjectVercelOrigin) {
+    return callback(null, true);
+  }
+
+  console.warn(`[CORS BLOCKED] origin=${normalizedOrigin}`);
+  return callback(null, false);
 }
 
 const server = http.createServer(app);
