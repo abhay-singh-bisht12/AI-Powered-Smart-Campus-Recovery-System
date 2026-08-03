@@ -1,54 +1,480 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <title>Register - Campus Lost & Found</title>
 
   <link rel="stylesheet" href="style.css" />
+
   <script src="config.js"></script>
   <script src="app.js" defer></script>
 </head>
 
 <body data-page="register">
+
   <section class="auth-page">
     <div class="auth-card">
+
+      <!-- LEFT SECTION -->
       <div class="auth-left">
         <span class="tag">Campus Safety Portal</span>
+
         <h1>Create Account</h1>
-        <p>Register first to access the Campus Lost & Found Portal.</p>
+
+        <p>
+          Register first to access the Campus Lost & Found Portal.
+        </p>
       </div>
 
+      <!-- RIGHT SECTION -->
       <div class="auth-right">
         <h2>Registration</h2>
 
-        <form id="registerForm">
+        <form id="registerForm" novalidate>
+
+          <!-- FULL NAME -->
           <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="registerName" required />
+            <label for="registerName">Full Name</label>
+
+            <input
+              type="text"
+              id="registerName"
+              name="name"
+              placeholder="Enter your full name"
+              autocomplete="name"
+              minlength="2"
+              maxlength="60"
+              required
+            />
           </div>
 
+          <!-- EMAIL -->
           <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="registerEmail" required />
+            <label for="registerEmail">Email</label>
+
+            <input
+              type="email"
+              id="registerEmail"
+              name="email"
+              placeholder="Enter your email"
+              autocomplete="email"
+              required
+            />
           </div>
 
+          <!-- PASSWORD -->
           <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="registerPassword" required />
+            <label for="registerPassword">Password</label>
+
+            <div class="password-input-wrapper">
+              <input
+                type="password"
+                id="registerPassword"
+                name="password"
+                placeholder="Create a strong password"
+                autocomplete="new-password"
+                minlength="8"
+                maxlength="64"
+                required
+              />
+
+              <button
+                type="button"
+                class="password-toggle-btn"
+                data-password-target="registerPassword"
+                aria-label="Show password"
+                title="Show password"
+              >
+                👁
+              </button>
+            </div>
+
+            <!-- PASSWORD RULES -->
+            <div
+              class="password-requirements"
+              id="passwordRequirements"
+            >
+              <p id="lengthRule" class="password-rule invalid">
+                <span>✕</span>
+                At least 8 characters
+              </p>
+
+              <p id="uppercaseRule" class="password-rule invalid">
+                <span>✕</span>
+                At least one uppercase letter
+              </p>
+
+              <p id="lowercaseRule" class="password-rule invalid">
+                <span>✕</span>
+                At least one lowercase letter
+              </p>
+
+              <p id="numberRule" class="password-rule invalid">
+                <span>✕</span>
+                At least one number
+              </p>
+
+              <p id="symbolRule" class="password-rule invalid">
+                <span>✕</span>
+                At least one special symbol
+              </p>
+            </div>
           </div>
 
-          <button type="submit" class="btn primary full-btn">Register</button>
-          <p id="registerMessage" class="message-text"></p>
+          <!-- CONFIRM PASSWORD -->
+          <div class="form-group">
+            <label for="confirmRegisterPassword">
+              Confirm Password
+            </label>
+
+            <div class="password-input-wrapper">
+              <input
+                type="password"
+                id="confirmRegisterPassword"
+                name="confirmPassword"
+                placeholder="Enter password again"
+                autocomplete="new-password"
+                minlength="8"
+                maxlength="64"
+                required
+              />
+
+              <button
+                type="button"
+                class="password-toggle-btn"
+                data-password-target="confirmRegisterPassword"
+                aria-label="Show password"
+                title="Show password"
+              >
+                👁
+              </button>
+            </div>
+
+            <p
+              id="passwordMatchMessage"
+              class="password-match-message"
+              aria-live="polite"
+            ></p>
+          </div>
+
+          <!-- REGISTER BUTTON -->
+          <button
+            type="submit"
+            class="btn primary full-btn"
+            id="registerButton"
+          >
+            Register
+          </button>
+
+          <!-- REGISTER MESSAGE -->
+          <p
+            id="registerMessage"
+            class="message-text"
+            aria-live="polite"
+          ></p>
         </form>
 
         <p class="switch-text">
           Already registered?
-          <a href="login.html" class="text-link">Go to Login</a>
+
+          <a href="login.html" class="text-link">
+            Go to Login
+          </a>
         </p>
       </div>
     </div>
   </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const registerForm =
+        document.getElementById("registerForm");
+
+      const passwordInput =
+        document.getElementById("registerPassword");
+
+      const confirmPasswordInput =
+        document.getElementById("confirmRegisterPassword");
+
+      const registerMessage =
+        document.getElementById("registerMessage");
+
+      const passwordMatchMessage =
+        document.getElementById("passwordMatchMessage");
+
+      const passwordRequirements =
+        document.getElementById("passwordRequirements");
+
+      const toggleButtons =
+        document.querySelectorAll(".password-toggle-btn");
+
+      const passwordRules = {
+        lengthRule: function (password) {
+          return password.length >= 8;
+        },
+
+        uppercaseRule: function (password) {
+          return /[A-Z]/.test(password);
+        },
+
+        lowercaseRule: function (password) {
+          return /[a-z]/.test(password);
+        },
+
+        numberRule: function (password) {
+          return /[0-9]/.test(password);
+        },
+
+        symbolRule: function (password) {
+          return /[^A-Za-z0-9]/.test(password);
+        }
+      };
+
+      function updateRule(ruleId, isValid) {
+        const ruleElement =
+          document.getElementById(ruleId);
+
+        if (!ruleElement) {
+          return;
+        }
+
+        const icon =
+          ruleElement.querySelector("span");
+
+        ruleElement.classList.toggle(
+          "valid",
+          isValid
+        );
+
+        ruleElement.classList.toggle(
+          "invalid",
+          !isValid
+        );
+
+        if (icon) {
+          icon.textContent =
+            isValid ? "✓" : "✕";
+        }
+      }
+
+      function validatePasswordRules(password) {
+        let allRulesValid = true;
+
+        Object.entries(passwordRules).forEach(
+          function ([ruleId, validationFunction]) {
+            const isValid =
+              validationFunction(password);
+
+            updateRule(ruleId, isValid);
+
+            if (!isValid) {
+              allRulesValid = false;
+            }
+          }
+        );
+
+        if (passwordRequirements) {
+          passwordRequirements.classList.toggle(
+            "all-valid",
+            allRulesValid
+          );
+        }
+
+        return allRulesValid;
+      }
+
+      function validatePasswordMatch() {
+        const password =
+          passwordInput.value;
+
+        const confirmPassword =
+          confirmPasswordInput.value;
+
+        if (!confirmPassword) {
+          passwordMatchMessage.textContent = "";
+
+          passwordMatchMessage.className =
+            "password-match-message";
+
+          return false;
+        }
+
+        if (password === confirmPassword) {
+          passwordMatchMessage.textContent =
+            "✓ Passwords match";
+
+          passwordMatchMessage.className =
+            "password-match-message valid";
+
+          return true;
+        }
+
+        passwordMatchMessage.textContent =
+          "✕ Passwords do not match";
+
+        passwordMatchMessage.className =
+          "password-match-message invalid";
+
+        return false;
+      }
+
+      passwordInput.addEventListener(
+        "input",
+        function () {
+          validatePasswordRules(
+            passwordInput.value
+          );
+
+          if (confirmPasswordInput.value) {
+            validatePasswordMatch();
+          }
+        }
+      );
+
+      confirmPasswordInput.addEventListener(
+        "input",
+        validatePasswordMatch
+      );
+
+      toggleButtons.forEach(function (button) {
+        button.addEventListener(
+          "click",
+          function () {
+            const targetInputId =
+              button.dataset.passwordTarget;
+
+            const targetInput =
+              document.getElementById(targetInputId);
+
+            if (!targetInput) {
+              return;
+            }
+
+            const passwordIsHidden =
+              targetInput.type === "password";
+
+            targetInput.type =
+              passwordIsHidden
+                ? "text"
+                : "password";
+
+            button.textContent =
+              passwordIsHidden
+                ? "🙈"
+                : "👁";
+
+            button.setAttribute(
+              "aria-label",
+              passwordIsHidden
+                ? "Hide password"
+                : "Show password"
+            );
+
+            button.setAttribute(
+              "title",
+              passwordIsHidden
+                ? "Hide password"
+                : "Show password"
+            );
+          }
+        );
+      });
+
+      /*
+        Capture mode is used so this validation runs
+        before the submit listener already present in app.js.
+      */
+      registerForm.addEventListener(
+        "submit",
+        function (event) {
+          registerMessage.textContent = "";
+          registerMessage.style.color = "#dc2626";
+
+          const fullName =
+            document
+              .getElementById("registerName")
+              .value
+              .trim();
+
+          const email =
+            document
+              .getElementById("registerEmail")
+              .value
+              .trim();
+
+          const password =
+            passwordInput.value;
+
+          const passwordIsStrong =
+            validatePasswordRules(password);
+
+          const passwordsMatch =
+            validatePasswordMatch();
+
+          if (fullName.length < 2) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            registerMessage.textContent =
+              "Please enter your full name.";
+
+            document
+              .getElementById("registerName")
+              .focus();
+
+            return;
+          }
+
+          if (!email) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            registerMessage.textContent =
+              "Please enter your email address.";
+
+            document
+              .getElementById("registerEmail")
+              .focus();
+
+            return;
+          }
+
+          if (!passwordIsStrong) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            registerMessage.textContent =
+              "Password must follow all the required rules.";
+
+            passwordInput.focus();
+
+            return;
+          }
+
+          if (!passwordsMatch) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            registerMessage.textContent =
+              "Password and confirm password must be the same.";
+
+            confirmPasswordInput.focus();
+
+            return;
+          }
+        },
+        true
+      );
+    });
+  </script>
+
 </body>
 </html>
+```

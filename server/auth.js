@@ -14,18 +14,13 @@ export function signAuthToken(userDoc) {
       role: userDoc.role
     },
     secret,
-    {
-      expiresIn: "7d"
-    }
+    { expiresIn: "7d" }
   );
 }
 
 export function verifyAuthToken(token) {
   const secret = process.env.JWT_SECRET;
-
-  if (!secret) {
-    return null;
-  }
+  if (!secret) return null;
 
   try {
     return jwt.verify(token, secret);

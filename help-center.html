@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Help Center - Campus Lost & Found</title>
-
   <link rel="stylesheet" href="style.css" />
   <script src="config.js"></script>
   <script src="app.js" defer></script>
@@ -14,15 +12,32 @@
 <body data-page="help-center">
   <header class="inner-header">
     <div class="container header-bar">
-      <div class="logo dark">Campus Lost & Found</div>
+      <div class="nav-top-row">
+        <div class="logo">Campus Lost & Found</div>
 
-      <div class="nav-links dark-links">
-        <a href="dashboard.html">Home</a>
-        <a href="my-reports.html">My Reports</a>
-        <a href="help-center.html">Help Center</a>
+        <button
+          id="mobileMenuToggle"
+          class="mobile-menu-toggle"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+        >
+          ☰
+        </button>
+      </div>
+
+      <div id="mainNavLinks" class="nav-links dark-links">
+        <a href="dashboard.html" data-i18n="home">Home</a>
+        <a href="my-reports.html" data-i18n="myReports">My Reports</a>
+        <a href="help-center.html" data-i18n="helpCenter">Help Center</a>
 
         <div class="nav-actions">
-          <button id="logoutBtn" class="nav-btn nav-btn-small" type="button">
+          <select id="languageSelect" class="language-select" aria-label="Select language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+          </select>
+
+          <button id="logoutBtn" class="nav-btn nav-btn-small" type="button" data-i18n="logout">
             Logout
           </button>
         </div>
@@ -33,8 +48,8 @@
   <main class="container">
     <section class="panel help-hero-panel">
       <div class="section-head">
-        <h2>Help Center</h2>
-        <p>
+        <h2 data-i18n="helpHeading">Help Center</h2>
+        <p data-i18n="helpDescription">
           Need help with lost or found items? Contact the campus support team.
         </p>
       </div>
@@ -68,8 +83,8 @@
 
     <section class="panel">
       <div class="section-head">
-        <h2>Frequently Asked Questions</h2>
-        <p>Quick answers for common student queries.</p>
+        <h2 data-i18n="faqHeading">Frequently Asked Questions</h2>
+        <p data-i18n="faqDescription">Quick answers for common student queries.</p>
       </div>
 
       <div class="faq-list">

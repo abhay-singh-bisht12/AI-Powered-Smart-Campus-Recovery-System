@@ -3,67 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Admin Panel - Campus Lost & Found</title>
-
   <link rel="stylesheet" href="style.css" />
   <script src="config.js"></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=15.0.0" defer></script>
 </head>
-
 <body data-page="admin">
   <header class="hero">
     <nav class="navbar">
-      <div class="logo">Admin Panel</div>
-
-      <div class="nav-links">
+      <div class="nav-top-row">
+        <div class="logo" data-i18n="adminPanel">Admin Panel</div>
+        <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+      </div>
+      <div id="mainNavLinks" class="nav-links">
         <span class="admin-label">Campus Lost & Found</span>
-
-        <button id="logoutBtn" class="nav-btn nav-btn-small" type="button">
-          Logout
-        </button>
+        <div class="nav-actions">
+          <select id="languageSelect" class="language-select" aria-label="Select language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+          </select>
+          <div id="campusNotificationBell" class="notification-bell-wrapper">
+            <button id="campusNotificationButton" class="notification-bell-button" type="button" aria-label="Open notifications" title="Notifications">🔔</button>
+            <span id="campusNotificationCount" class="notification-count hidden">0</span>
+            <div id="campusNotificationDropdown" class="notification-dropdown hidden">
+              <div class="notification-dropdown-head">
+                <h3>Notifications</h3>
+                <button id="campusClearNotifications" class="notification-clear-all" type="button">Clear all</button>
+              </div>
+              <div id="campusNotificationList"><p class="notification-empty">Loading...</p></div>
+            </div>
+          </div>
+          <button id="logoutBtn" class="nav-btn nav-btn-small" type="button" data-i18n="logout">Logout</button>
+        </div>
       </div>
     </nav>
 
     <div class="hero-content">
       <div class="hero-left">
-        <h1>Manage Reports</h1>
-        <p>
-          Review student reports, approve valid items, reject incorrect reports,
-          and manage campus lost and found records.
-        </p>
+        <h1 data-i18n="manageReports">Manage Reports</h1>
+        <p data-i18n="manageDescription">Review reports, approve valid items, and evaluate secure ownership claims with AI-assisted verification.</p>
       </div>
-
       <div class="hero-right">
-        <div class="stat-card">
-          <h3 id="totalCount">0</h3>
-          <p>Total Reports</p>
-        </div>
-
-        <div class="stat-card">
-          <h3 id="lostCount">0</h3>
-          <p>Lost Items</p>
-        </div>
-
-        <div class="stat-card">
-          <h3 id="foundCount">0</h3>
-          <p>Found Items</p>
-        </div>
-
-        <div class="stat-card">
-          <h3 id="pendingCount">0</h3>
-          <p>Pending</p>
-        </div>
-
-        <div class="stat-card">
-          <h3 id="rejectedCount">0</h3>
-          <p>Rejected</p>
-        </div>
-
-        <div class="stat-card">
-          <h3 id="claimedCount">0</h3>
-          <p>Claimed</p>
-        </div>
+        <div class="stat-card"><h3 id="totalCount">0</h3><p>Total Reports</p></div>
+        <div class="stat-card"><h3 id="lostCount">0</h3><p>Lost Items</p></div>
+        <div class="stat-card"><h3 id="foundCount">0</h3><p>Found Items</p></div>
+        <div class="stat-card"><h3 id="pendingCount">0</h3><p>Pending</p></div>
+        <div class="stat-card"><h3 id="rejectedCount">0</h3><p>Rejected</p></div>
+        <div class="stat-card"><h3 id="claimedCount">0</h3><p>Claimed</p></div>
       </div>
     </div>
   </header>
@@ -74,29 +60,21 @@
         <h2>All Student Reports</h2>
         <p>Approve, reject, view, or delete reports submitted by students.</p>
       </div>
-
       <div id="adminReportsContainer" class="cards"></div>
     </section>
-    <!-- ================= CLAIM REQUESTS ================= -->
 
-<section class="panel">
-
-  <div class="section-head">
-    <h2>Claim Requests</h2>
-
-    <p>
-      Review student claim requests and approve or reject ownership requests.
-    </p>
-  </div>
-
-  <div id="claimRequestsContainer" class="cards"></div>
-
-</section>
+    <section class="panel">
+      <div class="section-head">
+        <h2>Claim Requests</h2>
+        <p>Review validation details, AI trust score, risk level, recommendation, and approve or reject ownership requests.</p>
+      </div>
+      <div id="claimRequestsContainer" class="cards"></div>
+    </section>
   </main>
 
   <div id="modal" class="modal hidden">
     <div class="modal-box">
-      <button id="closeModal" class="close-btn">&times;</button>
+      <button id="closeModal" class="close-btn" type="button">&times;</button>
       <div id="modalContent"></div>
     </div>
   </div>

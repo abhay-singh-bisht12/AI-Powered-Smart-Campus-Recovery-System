@@ -2,82 +2,37 @@ import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    description: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    location: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    date: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    type: {
-      type: String,
-      enum: ["lost", "found"],
-      required: true
-    },
-    category: {
-      type: String,
-      required: true,
-      trim: true
-    },
-
-    contactName: {
-      type: String,
-      default: "",
-      trim: true
-    },
-    contactPhone: {
-      type: String,
-      default: "",
-      trim: true
-    },
-    contactEmail: {
-      type: String,
-      default: "",
-      trim: true
-    },
-
-    // For now image is saved as Base64 string
-    // Later you can replace this with Cloudinary URL
-    image: {
-      type: String,
-      default: ""
-    },
-
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
+    location: { type: String, required: true, trim: true },
+    date: { type: String, required: true, trim: true },
+    type: { type: String, enum: ["lost", "found"], required: true },
+    category: { type: String, required: true, trim: true },
+    contactName: { type: String, default: "", trim: true },
+    contactPhone: { type: String, default: "", trim: true },
+    contactEmail: { type: String, default: "", trim: true, lowercase: true },
+    image: { type: String, default: "" },
     approvalStatus: {
       type: String,
       enum: ["pending", "approved", "rejected"],
-      default: "pending"
+      default: "pending",
+      index: true
     },
     status: {
       type: String,
       enum: ["active", "claimed"],
-      default: "active"
+      default: "active",
+      index: true
     },
-
     createdBy: {
       type: String,
       required: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      index: true
     },
-
-    createdAt: {
-      type: Date,
-      default: Date.now
-    }
+    hiddenByOwner: { type: Boolean, default: false, index: true },
+    createdAt: { type: Date, default: Date.now }
   },
   {
     timestamps: false,
@@ -91,5 +46,4 @@ const itemSchema = new mongoose.Schema(
   }
 );
 
-export const Item =
-  mongoose.models.Item || mongoose.model("Item", itemSchema);
+export const Item = mongoose.models.Item || mongoose.model("Item", itemSchema);

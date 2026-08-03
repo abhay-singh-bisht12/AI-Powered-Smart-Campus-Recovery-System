@@ -12,43 +12,152 @@
 </head>
 
 <body data-page="login">
+
   <section class="auth-page">
     <div class="auth-card">
+
+      <!-- Left Section -->
       <div class="auth-left">
         <span class="tag">Campus Safety Portal</span>
+
         <h1>Welcome Back</h1>
-        <p>Login to continue and manage your lost and found reports.</p>
+
+        <p>
+          Login to continue and manage your lost and found reports.
+        </p>
       </div>
 
+      <!-- Right Section -->
       <div class="auth-right">
         <h2>Login</h2>
 
         <form id="loginForm">
-  <div class="form-group">
-    <label>Email</label>
-    <input type="email" id="loginEmail" required />
-  </div>
 
-  <div class="form-group">
-    <label>Password</label>
-    <input type="password" id="loginPassword" required />
-  </div>
+          <!-- Email -->
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
 
-  <button type="submit" class="btn primary full-btn">Login</button>
-  <p id="loginMessage" class="message-text"></p>
+            <input
+              type="email"
+              id="loginEmail"
+              name="email"
+              placeholder="Enter your email"
+              autocomplete="email"
+              required
+            />
+          </div>
 
-  <p class="forgot-text">
-    Forgot Password?
-    <a href="forgot-password.html" class="text-link">Reset here</a>
-  </p>
-</form>
+          <!-- Password -->
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
 
+            <div class="password-input-wrapper">
+              <input
+                type="password"
+                id="loginPassword"
+                name="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+
+              <button
+                type="button"
+                class="password-toggle-btn"
+                id="loginPasswordToggle"
+                aria-label="Show password"
+                title="Show password"
+              >
+                👁
+              </button>
+            </div>
+          </div>
+
+          <!-- Login Button -->
+          <button
+  type="submit"
+  class="btn primary full-btn"
+  id="loginButton"
+>
+  Login
+</button>
+
+          <!-- Login Message -->
+          <p
+            id="loginMessage"
+            class="message-text"
+            aria-live="polite"
+          ></p>
+
+          <!-- Forgot Password -->
+          <p class="forgot-text">
+            Forgot Password?
+
+            <a
+              href="forgot-password.html"
+              class="text-link"
+            >
+              Reset here
+            </a>
+          </p>
+
+        </form>
+
+        <!-- Register Link -->
         <p class="switch-text">
           New user?
-          <a href="register.html" class="text-link">Go to Register</a>
+
+          <a
+            href="register.html"
+            class="text-link"
+          >
+            Go to Register
+          </a>
         </p>
+
       </div>
     </div>
   </section>
+
+  <!-- Password Show/Hide Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const passwordInput =
+        document.getElementById("loginPassword");
+
+      const passwordToggle =
+        document.getElementById("loginPasswordToggle");
+
+      if (!passwordInput || !passwordToggle) {
+        return;
+      }
+
+      passwordToggle.addEventListener("click", function () {
+        const isPasswordHidden =
+          passwordInput.type === "password";
+
+        passwordInput.type =
+          isPasswordHidden ? "text" : "password";
+
+        passwordToggle.textContent =
+          isPasswordHidden ? "🙈" : "👁";
+
+        passwordToggle.setAttribute(
+          "aria-label",
+          isPasswordHidden
+            ? "Hide password"
+            : "Show password"
+        );
+
+        passwordToggle.setAttribute(
+          "title",
+          isPasswordHidden
+            ? "Hide password"
+            : "Show password"
+        );
+      });
+    });
+  </script>
+
 </body>
 </html>
